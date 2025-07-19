@@ -29,17 +29,17 @@ Uma aplicação de lista de tarefas moderna e responsiva construída com React e
 
 1. Clone o repositório:
 ```bash
-git clone https://github.com/seu-usuario/todo-list-app.git
+git clone https://github.com/marcusfeix/todo-list.git
 ```
 
 2. Navegue até o diretório do projeto:
 ```bash
-cd todo-list-app
+cd todo-list
 ```
 
 3. Instale as dependências:
 ```bash
-npm install
+cd todo && npm install
 ```
 
 4. Execute o projeto:
