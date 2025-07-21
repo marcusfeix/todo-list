@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './App.css';
 import Todo from './components/Todo';
 import TodoForm from './components/TodoForm';
@@ -6,47 +6,72 @@ import Search from './components/Search';
 import Filter from './components/Filter';
 
 function App()   {
-  const [todos, setTodos] = useState([
-    {
-      id: 1,
-      text: "Criar funcionalidade x no sistema",
-      category: "Trabalho",
-      isCompleted: false,
-    },
-    {
-      id: 2,
-      text: "Ir pra academia",
-      category: "Pessoal",
-      isCompleted: false,
-    },
-    {
-      id: 3,
-      text: "Estudar React",
-      category: "Estudos",
-      isCompleted: false,
-    },
+  // Função para carregar todos do localStorage
+  const loadTodosFromStorage = () => {
+    try {
+      const savedTodos = localStorage.getItem('todos');
+      if (savedTodos) {
+        return JSON.parse(savedTodos);
+      }
+    } catch (error) {
+      console.error('Erro ao carregar todos do localStorage:', error);
+    }
 
-  ]);
+    // Retorna todos padrão se não houver dados salvos
+    return [
+      {
+        id: 1,
+        text: "Criar funcionalidade x no sistema",
+        category: "Trabalho",
+        isCompleted: false,
+      },
+      {
+        id: 2,
+        text: "Ir pra academia",
+        category: "Pessoal",
+        isCompleted: false,
+      },
+      {
+        id: 3,
+        text: "Estudar React",
+        category: "Estudos",
+        isCompleted: false,
+      },
+    ];
+  };
+
+  const [todos, setTodos] = useState(loadTodosFromStorage);
   
   const[search, setSearch] = useState('');
 
   const [filter,setFilter]  = useState('all');
   const [sort, setSort] = useState('asc');
 
-  // Debug: log quando sort muda
-  console.log('Estado atual de sort:', sort);
+  // Função para salvar todos no localStorage
+  const saveTodosToStorage = (todosToSave) => {
+    try {
+      localStorage.setItem('todos', JSON.stringify(todosToSave));
+      console.log('Todos salvos no localStorage:', todosToSave);
+    } catch (error) {
+      console.error('Erro ao salvar todos no localStorage:', error);
+    }
+  };
+
+  // useEffect para salvar todos no localStorage sempre que mudar
+  useEffect(() => {
+    saveTodosToStorage(todos);
+  }, [todos]);
+
+
 
   const addTodo = (text, category) => {
-    console.log('addTodo chamado com:', text, category);
     const newTodo = {
-      id: Math.floor(Math.random() * 1000),
+      id: Math.floor(Math.random() * 10000), // Aumentei o range para evitar IDs duplicados
       text,
       category,
       isCompleted: false,
     };
-    console.log('Nova tarefa criada:', newTodo);
     setTodos([...todos, newTodo]);
-    console.log('Todos atualizados');
   };
 
  const removeTodo = (id) => {
@@ -62,6 +87,13 @@ const completeTodo = (id) => {
       : todo
   );
   setTodos(updatedTodos);
+};
+
+const clearAllTodos = () => {
+  if (window.confirm('Tem certeza que deseja limpar todas as tarefas? Esta ação não pode ser desfeita.')) {
+    setTodos([]);
+    localStorage.removeItem('todos');
+  }
 };
 
   return (
@@ -80,7 +112,6 @@ const completeTodo = (id) => {
           )
           .filter((todo) => todo.text.toLowerCase().includes(search.toLowerCase()))
           .sort((a, b) => {
-            console.log('Ordenando:', sort, 'Comparando:', a.text, 'vs', b.text);
             return sort === "asc"
               ? a.text.localeCompare(b.text)
               : b.text.localeCompare(a.text);
@@ -94,6 +125,25 @@ const completeTodo = (id) => {
         ))}
       </div>
       <TodoForm addTodo={addTodo} />
+
+      {todos.length > 0 && (
+        <div style={{ textAlign: 'center', marginTop: '20px' }}>
+          <button
+            onClick={clearAllTodos}
+            style={{
+              backgroundColor: '#dc2626',
+              color: 'white',
+              padding: '8px 16px',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontSize: '14px'
+            }}
+          >
+            🗑️ Limpar todas as tarefas
+          </button>
+        </div>
+      )}
     </div>
   );
 }

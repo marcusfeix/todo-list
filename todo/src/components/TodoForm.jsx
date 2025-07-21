@@ -6,13 +6,9 @@ const TodoForm = ({addTodo}) => {
   
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('handleSubmit executado');
-    console.log('value:', value, 'category:', category);
     if (!value || !category) {
-      console.log('Validação falhou - value ou category vazio');
       return;
     }
-    console.log('Chamando addTodo...');
     addTodo(value, category); // adicionar todo
     setValue('');
     setCategory('');
